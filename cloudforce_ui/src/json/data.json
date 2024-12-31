@@ -1,0 +1,46 @@
+{
+  "packages": [
+    {
+      "name": "starter",
+      "price": "119",
+      "frequency": "1-time price", 
+      "package": [
+        { "name": "1 user", "access": true },
+        { "name": "20GB cloud storage", "access": true },
+        { "name": "Integration help", "access": false },
+        { "name": "Upload files", "access": false },
+        { "name": "API access", "access": false },
+        { "name": "Complete documentation", "access": false }
+      ]
+    },
+    {
+      "name": "premium",
+      "price": "159",
+      "frequency": "1-time price", 
+      "package": [
+        { "name": "1 user", "access": true },
+        { "name": "40GB cloud storage", "access": true },
+        { "name": "Integration help", "access": true },
+        { "name": "Upload files", "access": true },
+        { "name": "API access", "access": false },
+        { "name": "Complete documentation", "access": false }
+      ]
+    },
+    {
+      "name": "enterprice",
+      "price": "399",
+      "frequency": "1-time price", 
+      "package": [
+        { "name": "Unlimited team members", "access": true },
+        { "name": "100GB cloud storage", "access": true },
+        { "name": "Integration help", "access": true },
+        { "name": "Upload files", "access": true },
+        { "name": "API access", "access": true },
+        { "name": "Complete documentation", "access": true }
+      ]
+    }
+  ]
+}
+
+
+
