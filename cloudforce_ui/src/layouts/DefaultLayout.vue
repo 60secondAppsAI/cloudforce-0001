@@ -146,12 +146,6 @@
 					</router-link>
 				</a-menu-item>
 		
-				<a-menu-item>
-					<router-link to="/cases">
-						<span class="label">Cases</span>
-					</router-link>
-				</a-menu-item>
-		
 	
         </a-menu>
       </a-layout-sider>

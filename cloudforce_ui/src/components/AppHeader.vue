@@ -20,7 +20,7 @@
 	      </template>
 	      <template #title><div class="hamburger" >&#9776</div></template>
 											<a-menu-item key="setting:1"><router-link class="link" to="/accounts">My Accounts</router-link></a-menu-item>
-														            <a-menu-item key="setting:1"><router-link class="link" to="/pricing">Pricing</router-link></a-menu-item>
+													            <a-menu-item key="setting:1"><router-link class="link" to="/pricing">Pricing</router-link></a-menu-item>
 
 	    </a-sub-menu>
 	  </a-menu>
@@ -31,7 +31,7 @@
 		<nav class="nav">
 								        <router-link class="link" to="/accounts">My Accounts</router-link>
             
-													        <router-link class="link" to="/pricing">Pricing</router-link>
+												        <router-link class="link" to="/pricing">Pricing</router-link>
         <router-link class="link" to="/users">Menu-item-2</router-link>
         <router-link class="link" to="/sign-in">Menu-item-3</router-link>
         <router-link class="link" to="/sign-in">Menu-item-4</router-link>

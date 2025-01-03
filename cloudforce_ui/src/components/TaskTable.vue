@@ -6,7 +6,7 @@
       <div class="col-8"></div>
        <div class="col-auto">
         <!-- Header Search Input -->
-        <a-input-search class="header-search" :class="searchLoading ? 'loading' : ''" placeholder="Search by BusinessUnit#, Location#, Operator#, City, State, FirstName, LastName…"
+        <a-input-search class="header-search" :class="searchLoading ? 'loading' : ''" placeholder="Search by color, sponsor, or style...."
           @search="onSearch" :loading='searchLoading' v-model="searchQuery">
           <svg slot="prefix" width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path fill-rule="evenodd" clip-rule="evenodd"
@@ -303,9 +303,6 @@ export default {
     },
     routingToCampaignDetail(id) {
       this.$router.push({ name: 'CampaignDetail', params: { campaignId: id.toString() }})
-    },
-    routingToCaseDetail(id) {
-      this.$router.push({ name: 'CaseDetail', params: { caseId: id.toString() }})
     },
     
     handleSearchQueryChanged() {

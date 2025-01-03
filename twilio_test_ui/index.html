@@ -1,0 +1,256 @@
+<html><head><base href="https://cdn.example.com/"><style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.6;
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+  background: #f5f5f5;
+}
+
+.container {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+h2 {
+  color: #2c3e50;
+  margin-bottom: 1.5rem;
+}
+
+.input-group {
+  margin-bottom: 1rem;
+}
+
+input {
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+button {
+  background: #3498db;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.3s ease;
+  margin-right: 1rem;
+}
+
+button:hover {
+  background: #2980b9;
+}
+
+.call-logs {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid #eee;
+}
+
+ul {
+  list-style: none;
+}
+
+li {
+  padding: 0.5rem;
+  border-bottom: 1px solid #eee;
+}
+
+.status-indicator {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.status-active { background: #2ecc71; }
+.status-completed { background: #3498db; }
+.status-failed { background: #e74c3c; }
+
+#errorMessage {
+  color: #e74c3c;
+  padding: 1rem;
+  margin: 1rem 0;
+  border-radius: 4px;
+  background: #fde2e2;
+  display: none;
+}
+</style></head><body>
+
+<div id="app">
+  <div class="container">
+    <h2>Open Call</h2>
+    <p>In this example, we request a Twilio Access Token from our Java Spring Boot application.
+    Then, we use the Twilio Voice SDK 2.0.1 javascript library to place a call from within the browser to the phone number entered here.</p>
+    <br>
+    <div id="errorMessage"></div>
+    
+    <div class="input-group">
+      <input type="tel" 
+             id="phoneNumber"
+             placeholder="Enter phone number (e.g. +1234567890)"
+             pattern="[\+]\d{10,}"
+             required>
+    </div>
+
+    <button id="callBtn" onclick="example1OpenCall()">Open Call</button>
+
+  </div>
+  <br>
+  <div class="container">
+    <h2>Initiate Call</h2>
+    <p>In this example, we pass the phone number entered here to our backend server which creates a call with a specific TwimlFunctionUrl. The TwimlUrl waits for the call to be answered, plays a brief message, and then connects the call to a phone number specified in the Twiml function.
+    <br>
+    <div id="errorMessage"></div>
+    
+    <div class="input-group">
+      <input type="tel" 
+             id="phoneNumber"
+             placeholder="Enter phone number (e.g. +1234567890)"
+             pattern="[\+]\d{10,}"
+             required>
+    </div>
+
+    <button id="callBtn" onclick="example2InitiateCall()">Initiate Call</button>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@twilio/voice-sdk@2.0.1/dist/twilio.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
+<script>
+
+let device;
+let currentCall = null;
+let twilioToken = '';
+
+function showError(message) {
+  const errorDiv = document.getElementById('errorMessage');
+  errorDiv.textContent = message;
+  errorDiv.style.display = 'block';
+  setTimeout(() => {
+    errorDiv.style.display = 'none';
+  }, 5000);
+}
+
+async function initializeTwilio() {
+  try {
+    const response = await fetch('https://60secondapps-0010.vip:8080/api/calls/token', {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      credentials: 'omit' 
+    });
+    
+    if (!response.ok) {
+      console.error('Response status:', response.status);
+      console.error('Response headers:', [...response.headers.entries()]);
+      const text = await response.text();
+      console.error('Response body:', text);
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      throw new Error(`Expected JSON response but got ${contentType}`);
+    }
+    
+    twilioToken = await response.text();
+    console.log('Received token:', twilioToken);
+
+    const decodedToken = jwt_decode(twilioToken);
+    console.log('Decoded token:', decodedToken);
+    
+    device = new Twilio.Device(twilioToken, {
+      codecPreferences: ['opus', 'pcmu'],
+      fakeLocalDTMF: true,
+      enableRingingState: true,
+      region: 'us1'
+    });
+
+    return true;
+  } catch (error) {
+    console.error('Failed to initialize Twilio:', error);
+    showError('Failed to initialize Twilio: ' + error.message);
+    return false;
+  }
+}
+
+async function example1OpenCall() {
+  const phoneNumber = document.getElementById('phoneNumber').value;
+  if (!phoneNumber) {
+    showError('Please enter a phone number');
+    return;
+  }
+
+  if (!device || device.state !== 'registered') {
+    await initializeTwilio();
+  }
+
+  if (currentCall) {
+    console.log('Already in a call, please finish the current call first.');
+    showError('Already in a call');
+    return;
+  }
+
+  console.log("Attempting to connect to phone number:", phoneNumber);
+  
+  try {
+    currentCall = await device.connect({ params: { To: phoneNumber } });
+    device.audio.setAudioConstraints({ echoCancellation: true });
+
+    currentCall.on('accept', () => {
+      console.log('Call accepted');
+    });
+
+    currentCall.on('disconnect', () => {
+      console.log('Call ended');
+      currentCall = null;
+    });
+
+  } catch (error) {
+    console.error('Error making call:', error);
+    showError('Failed to make call: ' + error.message);
+  }
+}
+
+async function example2InitiateCall() {
+  try {
+    const phoneNumber = document.getElementById('phoneNumber').value;
+    if (!phoneNumber) {
+      showError('Please enter a phone number');
+      return;
+    }
+
+    const response = await fetch(`https://60secondapps-0010.vip:8080/api/calls/make?to=${encodeURIComponent(phoneNumber)}&twimlUrl=${encodeURIComponent('')}`, {
+      method: 'POST',  
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      credentials: 'omit',
+    });
+
+    alert('Call initiated successfully! Call SID: ' + response.data);
+  } catch (error) {
+    console.error('Error:', error);  // Detailed error log for debugging
+    alert('Error: ' + (error.response ? error.response.data : error.message));
+  }
+}
+
+</script>
+
+</body></html>

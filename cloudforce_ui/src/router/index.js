@@ -39,8 +39,6 @@ import Tasks from  '@/pages/Tasks.vue';
 import TaskDetail from  '@/pages/TaskDetail.vue';
 import Campaigns from  '@/pages/Campaigns.vue';
 import CampaignDetail from  '@/pages/CampaignDetail.vue';
-import Cases from  '@/pages/Cases.vue';
-import CaseDetail from  '@/pages/CaseDetail.vue';
 
 Vue.use(VueRouter);
 
@@ -50,7 +48,7 @@ const routes = [
     name: "home",
     component: () => import("../views/HomeView.vue"),
 										redirect: '/accounts',
-													  },
+												  },
  
 
 
@@ -299,19 +297,6 @@ const routes = [
 	    name: 'CampaignDetail',
 		layout: DefaultLayout,
 	    component: CampaignDetail,
-	    props: true // Pass route params as props to the component
-  	},
-	{
-		path: '/cases',
-		name: 'Cases',
-		layout: DefaultLayout,
-		component: Cases,
-	},
-	{
-	    path: '/case/:caseId', 
-	    name: 'CaseDetail',
-		layout: DefaultLayout,
-	    component: CaseDetail,
 	    props: true // Pass route params as props to the component
   	},
 ];
